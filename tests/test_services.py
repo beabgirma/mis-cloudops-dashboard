@@ -41,3 +41,36 @@ def test_list_services():
     data = response.json()
     assert len(data["services"]) == 1
     assert data["services"][0]["name"] == "HR Portal"
+
+def test_update_service_status():
+    create_response = client.post(
+        "/services",
+        json={
+            "name": "Email Server",
+            "url": "https://mail.example.com",
+            "owner": "MIS Team"
+        }
+    )
+
+    service_id = create_response.json()["id"]
+    response = client.patch(
+        f"/services/{service_id}/status",
+        json={
+            "status": "online"
+        }
+    )
+
+    assert response.status_code == 200
+    data = response.json()
+    assert data["id"] == service_id
+    assert data["status"] == "online"
+
+def test_update_service_status_not_found():
+    response=client.patch(
+        "/services/999/status",
+        json={
+            "status":"offlime"
+        }
+    )
+    assert response.status_code == 404
+    assert response.json()["detail"]=="Service not found"
