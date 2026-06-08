@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from typing import Literal
 
 
 class ServiceCreate(BaseModel):
@@ -8,4 +9,4 @@ class ServiceCreate(BaseModel):
 
 
 class ServiceStatusUpdate(BaseModel):
-    status: str
+    status:Literal["unknown", "online", "offline","degraded"]

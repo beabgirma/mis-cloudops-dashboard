@@ -69,8 +69,19 @@ def test_update_service_status_not_found():
     response=client.patch(
         "/services/999/status",
         json={
-            "status":"offlime"
+            "status":"offline"
         }
     )
     assert response.status_code == 404
     assert response.json()["detail"]=="Service not found"
+
+def test_check_invalid_status():
+    response=client.patch(
+        "/services/1/status",
+        json={
+            "status":"banana"
+        }
+    )
+    assert response.status_code==422
+
+
