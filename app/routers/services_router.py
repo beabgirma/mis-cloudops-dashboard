@@ -19,3 +19,11 @@ def update_service_status(service_id: int, update: ServiceStatusUpdate):
     if updated_service is None:
         raise HTTPException(status_code=404, detail="Service not found")
     return updated_service
+
+@router.get("/services/{service_id}")
+def get_service_by_id(service_id:int):
+    service_by_id=service_service.get_service_by_id(service_id)
+
+    if service_by_id is None:
+        raise HTTPException(status_code=404, detail="Service not found")
+    return service_by_id
