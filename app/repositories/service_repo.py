@@ -29,4 +29,9 @@ def update_service_status_record(service_id: int, status: str):
             return service
     return None
 
+def get_service_by_id(service_id:int):
+    for service in services:
+        if service["id"]== service_id:
+            return service
+    return None
 

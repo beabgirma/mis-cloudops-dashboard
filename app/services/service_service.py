@@ -16,3 +16,8 @@ def update_service_status(service_id, update):
         service_id,
         update.status
     )
+
+def get_service_by_id(service_id):
+    return service_repo.get_service_by_id(
+        service_id
+    )
