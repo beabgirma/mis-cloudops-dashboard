@@ -11,13 +11,18 @@ def list_services():
     }
 
 
-def update_service_status(service_id, update):
+def update_service_status(service_id:int, update):
     return service_repo.update_service_status_record(
         service_id,
         update.status
     )
 
-def get_service_by_id(service_id):
+def get_service_by_id(service_id:int):
     return service_repo.get_service_by_id(
+        service_id
+    )
+
+def delete_service_by_id(service_id:int ):
+    return service_repo.delete_service_by_id(
         service_id
     )

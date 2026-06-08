@@ -35,3 +35,9 @@ def get_service_by_id(service_id:int):
             return service
     return None
 
+def delete_service_by_id(service_id: int):
+    for service in services:
+        if service["id"]== service_id:
+            services.remove(service)
+        return service
+    return None

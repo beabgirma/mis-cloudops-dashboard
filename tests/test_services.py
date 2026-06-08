@@ -102,12 +102,39 @@ def test_valid_service_by_id():
     assert data["id"] == service_id
     assert data["name"] == "HR server"
 
-"""1. Send GET request to /services/999
-2. Expect status code 404
-3. Expect detail to be "Service not found"""
-
 def test_get_service_by_id_not_found():
     response = client.get("/services/999")
-
     assert response.status_code == 404
     assert response.json()["detail"] == "Service not found"
+
+
+def test_delete_service_by_id():
+    response=client.post(
+        "/services",
+        json={
+            "name":"Network Server",
+            "url" : "https://mail.example.com",
+            "owner": "MIS Team"
+        }
+    )
+    service_id = response.json()["id"]
+    response=client.delete(
+        f"/services/{service_id}"
+    )
+    assert response.status_code==200
+    data =response.json()
+    assert data["id"]== service_id
+
+""" 1. Send a DELETE request to /services/999
+2. Do not create a service first
+3. Check that the response status code is 404
+4. Check that the response message says "Service not found"""
+
+def test_delete_service_by_id_not_found():
+    response=client.delete("/services/999")
+    assert response.status_code==404
+    assert response.json()["detail"]=="Service not found"
+
+
+
+
