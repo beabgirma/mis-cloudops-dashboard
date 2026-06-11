@@ -17,6 +17,7 @@ routers/        -> API endpoints
 services/       -> business logic
 repositories/   -> data storage logic
 schemas/        -> request validation
+database.py     -> SQLite database setup
 tests/          -> automated tests
 ```
 
@@ -31,8 +32,10 @@ This makes the project easier to grow, test, and maintain.
 * Get one service by ID
 * Update a service status
 * Delete a service by ID
+* Store services in SQLite
 * Validate allowed status values
 * Return 404 errors when a service does not exist
+* Run the app with Docker
 * Automated tests with Pytest
 * GitHub Actions workflow for running tests on pull requests
 
@@ -43,7 +46,9 @@ This makes the project easier to grow, test, and maintain.
 * Python
 * FastAPI
 * Pydantic
+* SQLite
 * Pytest
+* Docker
 * GitHub Actions
 * Git and GitHub
 
@@ -56,6 +61,7 @@ mis-cloudops-dashboard/
 │
 ├── app/
 │   ├── main.py
+│   ├── database.py
 │   │
 │   ├── routers/
 │   │   ├── __init__.py
@@ -81,6 +87,8 @@ mis-cloudops-dashboard/
 │   └── workflows/
 │       └── tests.yml
 │
+├── Dockerfile
+├── .dockerignore
 ├── requirements.txt
 ├── README.md
 └── .gitignore
@@ -229,6 +237,24 @@ If the service does not exist, it returns:
 
 ---
 
+## Database
+
+This project uses SQLite for local data storage.
+
+The database is initialized when the FastAPI app starts. Services are stored in a local `services.db` file, which is ignored by Git so local data is not pushed to GitHub.
+
+The services table stores:
+
+```text
+id
+name
+url
+owner
+status
+```
+
+---
+
 ## How to Run Locally
 
 ### 1. Clone the repository
@@ -282,6 +308,42 @@ FastAPI will show an interactive documentation page where you can test the endpo
 
 ---
 
+## Run with Docker
+
+This project can also be run inside a Docker container.
+
+### Build the Docker image
+
+```bash
+docker build -t mis-cloudops-dashboard .
+```
+
+### Run the container
+
+```bash
+docker run -p 8000:8000 mis-cloudops-dashboard
+```
+
+### Open the API docs
+
+Once the container is running, open:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+### Stop the container
+
+Press:
+
+```bash
+CTRL + C
+```
+
+The API runs on port `8000` inside the container and is accessible from the browser at `localhost:8000`.
+
+---
+
 ## How to Run Tests
 
 Run:
@@ -318,10 +380,12 @@ While building this project, I practiced:
 * Creating FastAPI routes
 * Using Pydantic schemas for validation
 * Structuring a backend project with routers, services, and repositories
+* Using SQLite for persistent local storage
 * Writing automated tests with Pytest
 * Handling API errors with proper status codes
 * Using Git branches and pull requests
 * Running automated tests with GitHub Actions
+* Building and running the API with Docker
 * Building a backend project with a more professional workflow
 
 ---
@@ -337,6 +401,8 @@ Completed features:
 * Update service status
 * Delete service by ID
 * Status validation
+* SQLite database storage
+* Docker support
 * Automated tests
 * GitHub Actions CI
 
@@ -346,9 +412,9 @@ Completed features:
 
 Possible next steps:
 
-* Add a real database instead of in-memory storage
 * Add service categories or tags
 * Add timestamps for created and updated services
 * Add authentication
-* Add Docker support
+* Add PostgreSQL support for production
 * Deploy the API online
+* Add a frontend dashboard
