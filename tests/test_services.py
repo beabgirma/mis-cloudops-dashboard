@@ -125,10 +125,6 @@ def test_delete_service_by_id():
     data =response.json()
     assert data["id"]== service_id
 
-""" 1. Send a DELETE request to /services/999
-2. Do not create a service first
-3. Check that the response status code is 404
-4. Check that the response message says "Service not found"""
 
 def test_delete_service_by_id_not_found():
     response=client.delete("/services/999")
