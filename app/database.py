@@ -16,7 +16,9 @@ def init_db():
     name TEXT NOT NULL,
     url TEXT NOT NULL,
     owner TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'unknown')'''
+    status TEXT NOT NULL DEFAULT 'unknown',
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL)'''
     )
 
     conn.commit()

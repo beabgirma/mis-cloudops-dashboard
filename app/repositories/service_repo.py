@@ -1,4 +1,5 @@
 from app.database import get_connection
+from datetime import datetime
 
 def row_to_dict(row):
     if row is None:
@@ -17,10 +18,12 @@ def reset_services():
 def create_service_record(service):
     conn=get_connection()
     cursor=conn.cursor()
+    current_time=datetime.now().isoformat()
     cursor.execute(
-        "INSERT INTO services (name, url, owner, status) VALUES (?, ?, ?, ?)",
-        (service.name, service.url, service.owner, "unknown")
+        "INSERT INTO services (name, url, owner, status, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?)",
+        (service.name, service.url, service.owner, "unknown", current_time, current_time)
     )
+
     conn.commit()
     service_id =cursor.lastrowid
     conn.close()
@@ -43,8 +46,9 @@ def list_service_records():
 def update_service_status_record(service_id: int, status: str):
     conn=get_connection()
     cursor=conn.cursor()
-    cursor.execute("UPDATE services SET status = ? WHERE id = ?",
-                   (status, service_id))
+    current_time=datetime.now().isoformat()
+    cursor.execute("UPDATE services SET status = ?, updated_at = ? WHERE id = ?",
+                   (status, current_time,service_id))
     conn.commit()
     conn.close()
     return get_service_by_id(service_id)

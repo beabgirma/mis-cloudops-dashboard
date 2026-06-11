@@ -28,10 +28,6 @@ def get_service_by_id(service_id:int):
         raise HTTPException(status_code=404, detail="Service not found")
     return service_by_id
 
-"""1. Receive service_id as an int
-2. Call service_service.delete_service_by_id(service_id)
-3. If the result is None, raise 404 with "Service not found"
-4. Otherwise return the deleted service"""
 
 @router.delete("/services/{service_id}")
 def delete_service_by_id(service_id:int):

@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 from app.main import app
 from app.repositories import service_repo
+import time
 
 client = TestClient(app)
 
@@ -20,11 +21,14 @@ def test_create_service():
     )
     assert response.status_code == 201
     data = response.json()
+    assert "created_at" in data
+    assert "updated_at" in data
 
     assert data["id"] == 1
     assert data["name"] == "Email Server"
     assert data["owner"] == "MIS Team"
     assert data["status"] == "unknown"
+    assert data["created_at"]== data["updated_at"]
 
 
 def test_list_services():
@@ -42,6 +46,14 @@ def test_list_services():
     assert len(data["services"]) == 1
     assert data["services"][0]["name"] == "HR Portal"
 
+"""1. Create service
+2. Save original created_at
+3. Save original updated_at
+4. Sleep for 0.01 seconds
+5. Update status
+6. Check created_at did not change
+7. Check updated_at did change"""
+
 def test_update_service_status():
     create_response = client.post(
         "/services",
@@ -52,7 +64,11 @@ def test_update_service_status():
         }
     )
 
-    service_id = create_response.json()["id"]
+    created_data = create_response.json()
+    service_id = created_data["id"]
+    original_created_at = created_data["created_at"]
+    original_updated_at = created_data["updated_at"]
+    time.sleep(0.01)
     response = client.patch(
         f"/services/{service_id}/status",
         json={
@@ -64,6 +80,9 @@ def test_update_service_status():
     data = response.json()
     assert data["id"] == service_id
     assert data["status"] == "online"
+    assert data["created_at"] == original_created_at
+    assert data["updated_at"] != original_updated_at
+
 
 def test_update_service_status_not_found():
     response=client.patch(

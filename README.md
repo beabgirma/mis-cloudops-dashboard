@@ -33,6 +33,7 @@ This makes the project easier to grow, test, and maintain.
 * Update a service status
 * Delete a service by ID
 * Store services in SQLite
+* Track when services are created and updated
 * Validate allowed status values
 * Return 404 errors when a service does not exist
 * Run the app with Docker
@@ -154,7 +155,9 @@ Example response:
       "name": "Email Server",
       "url": "https://mail.example.com",
       "owner": "MIS Team",
-      "status": "unknown"
+      "status": "unknown",
+      "created_at": "2026-06-11T12:00:00",
+      "updated_at": "2026-06-11T12:00:00"
     }
   ]
 }
@@ -251,6 +254,13 @@ name
 url
 owner
 status
+created_at
+updated_at
+```
+
+The `created_at` field stores when a service was first created.
+
+The `updated_at` field stores when a service was last updated.
 ```
 
 ---
@@ -402,9 +412,11 @@ Completed features:
 * Delete service by ID
 * Status validation
 * SQLite database storage
+* Created and updated timestamps
 * Docker support
 * Automated tests
 * GitHub Actions CI
+
 
 ---
 
