@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from app.routers import services_router
+from app.database import init_db
 
 app = FastAPI(title="MIS CloudOps Dashboard")
 
@@ -20,3 +21,5 @@ def health_check():
         "status": "ok",
         "service": "mis-cloudops-dashboard"
     }
+
+init_db()
