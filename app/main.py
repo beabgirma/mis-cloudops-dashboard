@@ -3,7 +3,7 @@ from app.routers import services_router
 from app.database import init_db
 import asyncio
 from contextlib import asynccontextmanager
-from service.service import periodic_health_checks
+from app.services.service_service import periodic_health_checks
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
