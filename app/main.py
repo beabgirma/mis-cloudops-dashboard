@@ -1,8 +1,16 @@
 from fastapi import FastAPI
 from app.routers import services_router
 from app.database import init_db
+from contextlib import asyncio,asynccontextmanager
+from service.service import periodic_health_checks
 
-app = FastAPI(title="MIS CloudOps Dashboard")
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    bg_task = asyncio.create_task(periodic_health_checks())
+    yield 
+    bg_task.cancel()
+
+app = FastAPI(title="MIS CloudOps Dashboard", lifespan=lifespan)
 
 app.include_router(services_router.router)
 
@@ -23,3 +31,7 @@ def health_check():
     }
 
 init_db()
+
+
+
+

@@ -2,6 +2,8 @@ from fastapi.testclient import TestClient
 from app.main import app
 from app.repositories import service_repo
 import time
+from unittest.mock import patch, AsyncMock, MagicMock
+
 
 client = TestClient(app)
 
@@ -45,14 +47,6 @@ def test_list_services():
     data = response.json()
     assert len(data["services"]) == 1
     assert data["services"][0]["name"] == "HR Portal"
-
-"""1. Create service
-2. Save original created_at
-3. Save original updated_at
-4. Sleep for 0.01 seconds
-5. Update status
-6. Check created_at did not change
-7. Check updated_at did change"""
 
 def test_update_service_status():
     create_response = client.post(
@@ -152,4 +146,64 @@ def test_delete_service_by_id_not_found():
 
 
 
+def test_trigger_health_check_not_found():
+    response=client.post("/services/9999/check")
+    assert response.status_code==404
+    assert response.json()["detail"]=="Service not found"
 
+
+def test_trigger_health_check_online():
+    response=client.post(
+        "/services",
+        json={
+            "name":"Network Server",
+            "url" : "https://mail.example.com",
+            "owner": "MIS Team"
+        }
+    )
+    service_id=response.json()["id"]
+    # 1. Start the patch with a standard 'with' block
+    with patch("app.services.service_service.httpx.AsyncClient") as mock_client_class:
+        mock_client = mock_client_class.return_value
+        
+        # This mocks the async context manager 'async with'
+        mock_client.__aenter__.return_value = mock_client
+        
+        # This mocks the awaitable '.get()' call and makes it return status 200
+        mock_client.get = AsyncMock()
+        mock_response = AsyncMock()
+        mock_response.status_code = 200
+        mock_client.get.return_value = mock_response
+
+        # 2. Trigger the check inside this 'with' block
+        check_response = client.post(f"/services/{service_id}/check")
+
+        # 3. Assertions
+        assert check_response.status_code == 200
+        assert check_response.json()["status"] == "online"
+    
+def test_trigger_health_check_offline():
+    response = client.post(
+        "/services",
+        json={
+            "name": "Failing Server",
+            "url" : "https://broken.example.com",
+            "owner": "MIS Team"
+        }
+    )
+    service_id = response.json()["id"]
+
+    with patch("app.services.service_service.httpx.AsyncClient") as mock_client_class:
+        mock_client = mock_client_class.return_value
+        mock_client.__aenter__.return_value = mock_client
+        
+        mock_client.get = AsyncMock()
+        mock_response = AsyncMock()
+        # Simulate a server failure (e.g., 500 Internal Server Error)
+        mock_response.status_code = 500
+        mock_client.get.return_value = mock_response
+
+        check_response = client.post(f"/services/{service_id}/check")
+
+        assert check_response.status_code == 200
+        assert check_response.json()["status"] == "offline"
