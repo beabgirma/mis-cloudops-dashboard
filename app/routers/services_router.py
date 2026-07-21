@@ -35,3 +35,12 @@ def delete_service_by_id(service_id:int):
     if service_by_id is None:
         raise HTTPException(status_code=404, detail="Service not found")
     return service_by_id
+
+
+@router.post("/services/{service_id}/check")
+async def trigger_health_check(service_id:int):
+    thc= await service_service.check_health(service_id)
+    if thc is None:
+        raise HTTPException(status_code=404, detail="Service not found")
+    return thc
+    
