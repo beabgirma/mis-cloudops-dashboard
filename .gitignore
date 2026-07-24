@@ -4,3 +4,9 @@ __pycache__/
 *.pyc 
 .env
 services.db
+
+# Ignore local terraform directories
+**/.terraform/*
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
