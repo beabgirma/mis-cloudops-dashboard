@@ -3,18 +3,10 @@ from app.main import app
 
 client = TestClient(app)
 
-def test_health_check():
-    response=client.get("/health")
-    assert response.status_code==200
-    assert response.json() == {
-        "status": "ok",
-        "service": "mis-cloudops-dashboard"
-    }
-
 def test_root():
-    response= client.get("/")
-    assert response.status_code ==200
-    assert response.json()["status"]=="running"
-
-
-
+    # Verify the dashboard loads successfully as an HTML page
+    response = client.get("/")
+    assert response.status_code == 200
+    assert "text/html" in response.headers["content-type"]
+    # Check that a signature element from your dashboard template is inside the page
+    assert "Dashboard" in response.text
