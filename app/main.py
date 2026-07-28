@@ -1,58 +1,121 @@
+import asyncio
+import subprocess
+import os
+import sys
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, Request
-from fastapi.responses import HTMLResponse
+from fastapi import FastAPI, Request, Form
+from fastapi.responses import HTMLResponse, RedirectResponse
 from fastapi.templating import Jinja2Templates
+from types import SimpleNamespace
 
-from app.routers import services_router
-from app.repositories.service_repo import list_service_records
 from app.database import init_db
+from app.repositories.service_repo import list_service_records, create_service_record
+from app.health_checker import monitor_services_loop
+from app.redis_client import send_redis_command
+from app.routers.services_router import router as services_router
 
-# 1. Database and App Lifespan Management
+redis_process = None
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    app_dir = os.path.dirname(os.path.abspath(__file__))               # app/
+    project_root = os.path.dirname(app_dir)                            # MIS-cloud-dashboard/
+    parent_dir = os.path.dirname(project_root)                         # Sibling container folder
+
+    # Strategy A: Look for it as a sibling directory
+    redis_script_path = os.path.join(parent_dir, "mini-redis", "server.py")
+
+    # Strategy B: Fallback if mini-redis is inside the dashboard folder (this will trip now!)
+    if not os.path.exists(redis_script_path):
+        redis_script_path = os.path.join(project_root, "mini-redis", "server.py")
+    
+    if os.path.exists(redis_script_path):
+        redis_process = subprocess.Popen(
+            [sys.executable, redis_script_path],
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL
+        )
+        # Give the TCP port listener a moment to initialize and bind
+        await asyncio.sleep(1.0)
+
+    # Setup standard SQLite table structure
     init_db()
+
+    # Spin up the background network URL ping daemon loop
+    asyncio.create_task(monitor_services_loop())
+
     yield
 
-# 2. Application Initialization
-app = FastAPI(title="MIS CloudOps Dashboard", lifespan=lifespan)
+    # Clean shutdown of the Redis sub-process engine
+    if redis_process:
+        redis_process.terminate()
+        redis_process.wait()
 
-# 3. Template Configuration & Router Registration
+app = FastAPI(lifespan=lifespan)
 templates = Jinja2Templates(directory="app/templates")
-app.include_router(services_router.router)
 
-# 4. Root Dashboard View Route
+# Mount dynamic routers
+app.include_router(services_router)
+
 @app.get("/", response_class=HTMLResponse)
 async def read_dashboard(request: Request):
-    db_services = list_service_records()
+    # Fetch active assets out of SQLite persistence engine
+    services_list = list_service_records()
     
-    # Calculate global metrics
-    total_services = len(db_services)
-    
-    # Safely extract status whether the service is an object or a dictionary
-    def get_status(s):
-        return getattr(s, 'status', None) or (s.get('status') if isinstance(s, dict) else None)
-        
-    active_services = sum(1 for s in db_services if get_status(s) == 'operational')
-    
-    # Determine global system status for the template's metrics block
-    # If there are services and all of them are operational, system is Operational. Otherwise, Degraded.
-    if total_services > 0 and active_services == total_services:
-        system_status = "Operational"
-    else:
-        system_status = "Degraded"
+    enriched_services = []
+    total_count = len(services_list)
+    healthy_count = 0
+    unhealthy_count = 0
 
-    # Wrap inside the 'metrics' object the template expects
+    for s in services_list:
+        # Pull ephemeral real-time health updates out of the Redis structures using the aligned pattern
+        status = send_redis_command(f"GET service:{s['id']}:status")
+        if not status:
+            status = "REDIS_DOWN"
+        
+        if status == "Healthy":
+            healthy_count += 1
+        elif status == "Unhealthy":
+            unhealthy_count += 1
+
+        enriched_services.append({
+            "id": s["id"],
+            "name": s["name"],
+            "url": s["url"],
+            "owner": s["owner"],
+            "status": status
+        })
+
     metrics = {
-        "status": system_status
+        "total": total_count,
+        "healthy": healthy_count,
+        "unhealthy": unhealthy_count
     }
 
+    # Pass request as the first positional argument to clear deprecation warnings cleanly
     return templates.TemplateResponse(
-        request, 
-        "dashboard.html", 
+        request,
+        "dashboard.html",
         {
-            "total_services": total_services,
-            "active_services": active_services,
-            "db_services": db_services,
+            "services": enriched_services,
             "metrics": metrics
         }
     )
+
+@app.post("/services/add")
+async def add_new_service(
+    name: str = Form(...),
+    url: str = Form(...),
+    owner: str = Form(...)
+):
+    """Inserts a user-submitted service asset using SimpleNamespace to match dot-notation requirements."""
+    service_data = SimpleNamespace(
+        name=name,
+        url=url,
+        owner=owner
+    )
+    
+    create_service_record(service_data)
+
+    # Redirect back to home screen to refresh dashboard stats instantly
+    return RedirectResponse(url="/", status_code=303)
