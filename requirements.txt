@@ -4,3 +4,4 @@ pytest
 httpx
 jinja2
 python-multipart>=0.0.6
+curl-cffi>=0.7.0

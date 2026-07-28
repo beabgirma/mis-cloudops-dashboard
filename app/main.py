@@ -18,6 +18,7 @@ redis_process = None
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    global redis_process
     app_dir = os.path.dirname(os.path.abspath(__file__))               # app/
     project_root = os.path.dirname(app_dir)                            # MIS-cloud-dashboard/
     parent_dir = os.path.dirname(project_root)                         # Sibling container folder
