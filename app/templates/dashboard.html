@@ -3,109 +3,142 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AUC MIS CloudOps Dashboard</title>
-    <!-- Tailwind CSS CDN for instant responsive styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>MIS CloudOps Dashboard</title>
+    <!-- Tailwind CSS for rapid dashboard styling -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 </head>
-<body class="bg-gray-900 text-gray-100 font-sans min-h-screen">
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
 
-    <!-- Navbar -->
-    <nav class="bg-gray-800 border-b border-gray-700 px-6 py-4 flex justify-between items-center">
-        <div class="flex items-center space-x-3">
-            <span class="text-xl font-bold tracking-wider text-blue-400">AUC MIS CLOUDOPS</span>
-            <span class="bg-blue-900/50 text-blue-300 text-xs px-2.5 py-0.5 rounded-full border border-blue-800 font-mono">v1.0.0</span>
+    <!-- Header Navigation Panel -->
+    <header class="border-b border-slate-800 bg-slate-950/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="h-9 w-9 bg-indigo-600 rounded-lg flex items-center justify-center shadow-lg shadow-indigo-500/20">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                </div>
+                <span class="text-lg font-bold tracking-tight bg-gradient-to-r from-indigo-400 to-cyan-400 bg-clip-text text-transparent">MIS CloudOps Dashboard</span>
+            </div>
+            <div class="flex items-center space-x-4">
+                <span class="flex items-center text-xs font-medium text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20 animate-pulse">
+                    Live System Monitor
+                </span>
+            </div>
         </div>
-        <div class="flex items-center space-x-2">
-            <div class="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse"></div>
-            <span class="text-sm font-medium text-emerald-400">Environment: Secure AWS EC2</span>
-        </div>
-    </nav>
+    </header>
 
-    <!-- Main Container -->
-    <main class="max-w-7xl mx-auto p-6 lg:p-8 space-y-8">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         
-        <!-- Header Section -->
-        <div>
-            <h1 class="text-3xl font-bold text-white tracking-tight">System Infrastructure Overview</h1>
-            <p class="text-gray-400 mt-1">Real-time status monitoring and isolated environment compliance metrics.</p>
-        </div>
+        <!-- Metrics Component Card Grid Grid -->
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800/80 shadow-xl flex items-center space-x-5">
+                <div class="p-3 bg-slate-900 text-indigo-400 rounded-xl border border-slate-800"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div>
+                <div>
+                    <p class="text-sm font-medium text-slate-400 uppercase tracking-wider">Total Assets Managed</p>
+                    <p class="text-3xl font-bold mt-1 text-slate-100">{{ metrics.total }}</p>
+                </div>
+            </div>
+            <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800/80 shadow-xl flex items-center space-x-5">
+                <div class="p-3 bg-slate-900 text-emerald-400 rounded-xl border border-slate-800"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+                <div>
+                    <p class="text-sm font-medium text-slate-400 uppercase tracking-wider">Healthy Infrastructure</p>
+                    <p class="text-3xl font-bold mt-1 text-emerald-400">{{ metrics.healthy }}</p>
+                </div>
+            </div>
+            <div class="bg-slate-950 p-6 rounded-2xl border border-slate-800/80 shadow-xl flex items-center space-x-5">
+                <div class="p-3 bg-slate-900 text-rose-400 rounded-xl border border-slate-800"><svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg></div>
+                <div>
+                    <p class="text-sm font-medium text-slate-400 uppercase tracking-wider">Critical Incidents</p>
+                    <p class="text-3xl font-bold mt-1 text-rose-400">{{ metrics.unhealthy }}</p>
+                </div>
+            </div>
+        </section>
 
-        <!-- Metrics Grid -->
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <!-- Status Card -->
-            <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-sm">
-                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">System Status</p>
-                {% if metrics.status == 'Operational' %}
-                <p class="text-2xl font-bold text-emerald-400 mt-2">{{ metrics.status }}</p>
-                {% else %}
-                <p class="text-2xl font-bold text-rose-400 mt-2">{{ metrics.status }}</p>
-                {% endif %}
+        <!-- Dynamic Asset Registration Panels and Table Section Split Layout -->
+        <section class="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
+            
+            <!-- Asset Provisioning Form Interface -->
+            <div class="bg-slate-950 rounded-2xl border border-slate-800 shadow-xl overflow-hidden lg:col-span-1">
+                <div class="p-6 border-b border-slate-800 bg-slate-900/40">
+                    <h2 class="text-base font-semibold text-slate-100">Register Target Asset</h2>
+                    <p class="text-xs text-slate-400 mt-1">Deploy dynamic microservices to runtime cluster tracking engine</p>
+                </div>
+                <form action="/services/add" method="POST" class="p-6 space-y-4">
+                    <div>
+                        <label for="name" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Service Namespace</label>
+                        <input type="text" id="name" name="name" required placeholder="e.g. Auth Gateway API" 
+                            class="w-full mt-1.5 bg-slate-900 border border-slate-800 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition">
+                    </div>
+                    <div>
+                        <label for="url" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Healthcheck URL Endpoint</label>
+                        <input type="url" id="url" name="url" required placeholder="https://api.example.com/health" 
+                            class="w-full mt-1.5 bg-slate-900 border border-slate-800 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition">
+                    </div>
+                    <div>
+                        <label for="owner" class="block text-xs font-semibold text-slate-300 uppercase tracking-wider">Operations Lead</label>
+                        <input type="text" id="owner" name="owner" required placeholder="e.g. DevOps Core Team" 
+                            class="w-full mt-1.5 bg-slate-900 border border-slate-800 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition">
+                    </div>
+                    <button type="submit" 
+                        class="w-full mt-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium text-sm py-2.5 px-4 rounded-xl cursor-pointer shadow-lg shadow-indigo-600/20 hover:shadow-indigo-500/30 transition duration-150 active:scale-[0.98]">
+                        Provision Infrastructure
+                    </button>
+                </form>
             </div>
-            <!-- Uptime Card -->
-            <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-sm">
-                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Platform Uptime</p>
-                <p class="text-2xl font-bold text-white mt-2">{{ metrics.uptime }}</p>
-            </div>
-            <!-- Containers Card -->
-            <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-sm">
-                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Isolated Containers</p>
-                <p class="text-2xl font-bold text-blue-400 mt-2">{{ metrics.active_containers }} Active</p>
-            </div>
-            <!-- Disaster Recovery Card -->
-            <div class="bg-gray-800 border border-gray-700 rounded-xl p-6 shadow-sm">
-                <p class="text-xs font-semibold uppercase tracking-wider text-gray-400">Last Disaster Snapshot</p>
-                <p class="text-sm font-mono text-gray-300 mt-3">{{ metrics.last_backup }}</p>
-            </div>
-        </div>
 
-        <!-- Operational Logs Table -->
-        <div class="bg-gray-800 border border-gray-700 rounded-xl shadow-sm overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-700 bg-gray-800/50">
-                <h2 class="text-lg font-semibold text-white">Active Managed Infrastructure Assets</h2>
+            <!-- Active Cluster Infrastructure Status Table Representation -->
+            <div class="bg-slate-950 rounded-2xl border border-slate-800 shadow-xl overflow-hidden lg:col-span-2">
+                <div class="p-6 border-b border-slate-800 bg-slate-900/40">
+                    <h2 class="text-base font-semibold text-slate-100">Monitored Service Registrations</h2>
+                    <p class="text-xs text-slate-400 mt-1">Real-time cluster telemetry extracted from local persistence engines</p>
+                </div>
+                <div class="overflow-x-auto">
+                    <table class="w-full border-collapse text-left">
+                        <thead>
+                            <tr class="border-b border-slate-800 text-xs font-semibold uppercase tracking-wider text-slate-400 bg-slate-900/20">
+                                <th class="px-6 py-4">ID</th>
+                                <th class="px-6 py-4">Service Asset</th>
+                                <th class="px-6 py-4">Operational Domain URL</th>
+                                <th class="px-6 py-4">Owner</th>
+                                <th class="px-6 py-4 text-center">Runtime State</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-800 text-sm">
+                            {% for service in services %}
+                            <tr class="hover:bg-slate-900/30 transition">
+                                <td class="px-6 py-4 text-slate-500 font-mono text-xs">#{{ service.id }}</td>
+                                <td class="px-6 py-4 font-semibold text-slate-200">{{ service.name }}</td>
+                                <td class="px-6 py-4 text-slate-400 font-mono text-xs truncate max-w-[200px]">{{ service.url }}</td>
+                                <td class="px-6 py-4 text-slate-400">{{ service.owner }}</td>
+                                <td class="px-6 py-4 text-center whitespace-nowrap">
+                                    {% if service.status == 'Healthy' %}
+                                    <span class="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                        Healthy
+                                    </span>
+                                    {% elif service.status == 'Unhealthy' %}
+                                    <span class="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                                        Unhealthy
+                                    </span>
+                                    {% else %}
+                                    <span class="inline-flex items-center text-xs font-semibold px-2.5 py-0.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                        {{ service.status }}
+                                    </span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="5" class="px-6 py-12 text-center text-slate-500 text-sm">
+                                    No infrastructure targets currently monitored by runtime orchestration engines.
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
             </div>
-            <div class="overflow-x-auto">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="bg-gray-900/40 text-xs font-semibold uppercase tracking-wider text-gray-400 border-b border-gray-700">
-                            <th class="px-6 py-3">Service Name</th>
-                            <th class="px-6 py-3">Target Endpoint URL</th>
-                            <th class="px-6 py-3">System Owner</th>
-                            <th class="px-6 py-3 text-right">Operational Status</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-700 text-sm font-mono">
-                        {% for log in logs %}
-                        <tr class="hover:bg-gray-700/30 transition-colors">
-                            <!-- Service Name -->
-                            <td class="px-6 py-4 font-semibold text-blue-300">
-                                {{ log.name if log is mapping else log.name }}
-                            </td>
-                            <!-- Target Endpoint URL -->
-                            <td class="px-6 py-4 text-gray-300 text-xs">
-                                {{ log.url if log is mapping else log.url }}
-                            </td>
-                            <!-- System Owner -->
-                            <td class="px-6 py-4 text-gray-400">
-                                {{ log.owner if log is mapping else log.owner }}
-                            </td>
-                            <!-- Operational Status Dynamic Badge -->
-                            <td class="px-6 py-4 text-right">
-                                {% if (log.status if log is mapping else log.status) == 'Operational' %}
-                                <span class="bg-emerald-950/80 text-emerald-400 text-xs px-2 py-0.5 rounded border border-emerald-800 font-semibold">
-                                    Operational
-                                </span>
-                                {% else %}
-                                <span class="bg-rose-950/80 text-rose-400 text-xs px-2 py-0.5 rounded border border-rose-800 font-semibold">
-                                    {{ log.status if log is mapping else log.status }}
-                                </span>
-                                {% endif %}
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
+
+        </section>
     </main>
+
 </body>
 </html>
